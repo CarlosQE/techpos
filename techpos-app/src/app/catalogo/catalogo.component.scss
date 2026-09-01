@@ -1,0 +1,41 @@
+.tp-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.tp-tabla {
+  width: 100%;
+  border-radius: var(--tp-radius-sm);
+  overflow: hidden;
+}
+
+.tp-precio-bob {
+  color: var(--tp-primary-dark);
+  font-weight: 500;
+}
+
+.tp-stock-bajo {
+  color: var(--tp-warning);
+  font-weight: 500;
+}
+
+.tp-vacio {
+  text-align: center;
+  color: var(--tp-on-surface-variant);
+  padding: 32px 0;
+}
+
+.tp-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 320px;
+}

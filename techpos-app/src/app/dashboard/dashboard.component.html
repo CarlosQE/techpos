@@ -1,0 +1,57 @@
+<h1>Dashboard</h1>
+
+@if (cargando()) {
+  <p class="tp-vacio">Cargando KPIs…</p>
+} @else if (error()) {
+  <p class="tp-vacio">
+    No se pudieron cargar los KPIs (¿el backend está en línea?).
+    <button mat-stroked-button (click)="cargar()">Reintentar</button>
+  </p>
+} @else {
+  @if (kpis(); as k) {
+    <div class="tp-kpis">
+      <div class="tp-kpi-card">
+        <mat-icon aria-hidden="true">inventory_2</mat-icon>
+        <span class="tp-kpi-card__etiqueta">Inventario (USD)</span>
+        <span class="tp-kpi-card__valor tp-monto">{{ k.valorTotalInventarioUsd | number: '1.2-2' }}</span>
+      </div>
+
+      <div class="tp-kpi-card">
+        <mat-icon aria-hidden="true">payments</mat-icon>
+        <span class="tp-kpi-card__etiqueta">Inventario (Bs)</span>
+        <span class="tp-kpi-card__valor tp-monto">
+          {{ k.valorTotalInventarioBob !== null ? (k.valorTotalInventarioBob | number: '1.2-2') : 'Sin TC' }}
+        </span>
+      </div>
+
+      <div class="tp-kpi-card">
+        <mat-icon aria-hidden="true">trending_up</mat-icon>
+        <span class="tp-kpi-card__etiqueta">Margen proyectado</span>
+        <span class="tp-kpi-card__valor tp-monto">{{ k.margenComercialProyectadoPorcentaje | number: '1.1-1' }}%</span>
+      </div>
+
+      <div class="tp-kpi-card" [class.tp-kpi-card--alerta]="k.productosStockBajo.length > 0">
+        <mat-icon aria-hidden="true">warning</mat-icon>
+        <span class="tp-kpi-card__etiqueta">Productos con stock bajo</span>
+        <span class="tp-kpi-card__valor tp-monto">{{ k.productosStockBajo.length }}</span>
+      </div>
+    </div>
+
+    @if (k.productosStockBajo.length > 0) {
+      <section class="tp-alerta-stock">
+        <h2>
+          <mat-icon aria-hidden="true">warning</mat-icon>
+          Alerta de stock bajo (≤ 3 unidades)
+        </h2>
+        <ul>
+          @for (producto of k.productosStockBajo; track producto.id) {
+            <li>
+              <span>{{ producto.nombre }} ({{ producto.sku }})</span>
+              <span class="tp-monto">{{ producto.stock }} und.</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+}

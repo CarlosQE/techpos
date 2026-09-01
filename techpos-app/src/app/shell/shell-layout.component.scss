@@ -1,0 +1,141 @@
+.tp-toolbar {
+  background: var(--tp-surface);
+  color: var(--tp-on-surface);
+  border-bottom: 1px solid var(--tp-outline);
+  box-shadow: var(--tp-elevation-1);
+  gap: 8px;
+
+  &__marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--tp-primary);
+    margin-right: 24px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    font-family: inherit;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__nav-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--tp-on-surface-variant);
+
+    &--activo {
+      color: var(--tp-primary);
+      background: var(--tp-primary-container);
+    }
+  }
+
+  &__spacer {
+    flex: 1 1 auto;
+  }
+}
+
+.tp-tc-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--tp-radius-sm);
+  background: var(--tp-primary-container);
+  color: var(--tp-primary-dark);
+  font-size: 0.875rem;
+  margin-right: 8px;
+
+  &--fallback {
+    background: #fef7e0;
+    color: #7a5900;
+  }
+
+  &__alerta {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    color: var(--tp-warning);
+  }
+}
+
+.tp-contenido {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tp-ancho-completo {
+  width: 100%;
+}
+
+.tp-gatito-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  padding: 16px;
+}
+
+.tp-gatito-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  padding: 20px 28px;
+  max-width: 420px;
+  width: 100%;
+  cursor: default;
+  text-align: center;
+}
+
+.tp-gatito-arte {
+  margin: 0;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.15;
+  color: #333;
+  white-space: pre;
+  overflow-x: auto;
+  display: inline-block;
+  text-align: left;
+}
+
+.tp-gatito-arte--chico {
+  font-size: 18px;
+  line-height: 1.2;
+  padding: 8px 4px;
+}
+
+.tp-gatito-texto {
+  margin: 12px 0 4px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #b91c1c;
+}
+
+.tp-gatito-titulo {
+  margin: 14px 0 4px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.tp-gatito-sub {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}

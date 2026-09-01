@@ -1,0 +1,58 @@
+// Theme M3 de TechPOS — generado con `ng generate @angular/material:m3-theme`
+// a partir de nuestro azul de marca (#1a73e8). No editar $light-theme a mano;
+// para cambiar el color, volver a correr ese comando.
+@use '@angular/material' as mat;
+@use './m3-theme' as theme;
+
+@include mat.core();
+
+:root {
+  @include mat.all-component-themes(theme.$light-theme);
+
+  // Tokens propios (además de los que expone Angular Material) para nuestros
+  // componentes (.tp-*): mismo azul, pero accesibles como variables simples.
+  --tp-primary: #1a73e8;
+  --tp-primary-dark: #004493;
+  --tp-primary-container: #d8e2ff;
+  --tp-on-primary: #ffffff;
+
+  --tp-surface: #ffffff;
+  --tp-background: #f8f9fa;
+  --tp-outline: #dadce0;
+  --tp-on-surface: #191c23;
+  --tp-on-surface-variant: #5c5e67;
+
+  --tp-success: #188038;
+  --tp-warning: #ea8600;
+  --tp-error: #ba1a1a;
+
+  --tp-radius-sm: 12px;
+  --tp-radius-lg: 24px;
+  --tp-elevation-1: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  --tp-elevation-2: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+
+  --tp-font: Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --tp-font-mono: 'Roboto Mono', 'Courier New', monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--tp-font);
+  background: var(--tp-background);
+  color: var(--tp-on-surface);
+}
+
+.mat-mdc-card,
+.mat-mdc-dialog-surface {
+  border-radius: var(--tp-radius-lg) !important;
+}
+
+.tp-monto {
+  font-family: var(--tp-font-mono);
+  font-variant-numeric: tabular-nums;
+}

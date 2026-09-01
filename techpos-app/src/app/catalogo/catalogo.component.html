@@ -1,0 +1,94 @@
+<div class="tp-encabezado">
+  <h1>Catálogo</h1>
+  <button mat-flat-button color="primary" (click)="abrirAltaProducto(dialogoAltaProducto)">
+    <mat-icon aria-hidden="true">add</mat-icon>
+    Nuevo producto
+  </button>
+</div>
+
+<table mat-table [dataSource]="productos()" class="tp-tabla mat-elevation-z1">
+  <ng-container matColumnDef="sku">
+    <th mat-header-cell *matHeaderCellDef>SKU</th>
+    <td mat-cell *matCellDef="let producto">{{ producto.sku }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="nombre">
+    <th mat-header-cell *matHeaderCellDef>Nombre</th>
+    <td mat-cell *matCellDef="let producto">{{ producto.nombre }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="categoria">
+    <th mat-header-cell *matHeaderCellDef>Categoría</th>
+    <td mat-cell *matCellDef="let producto">{{ producto.categoria }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="costoUsd">
+    <th mat-header-cell *matHeaderCellDef>Costo USD</th>
+    <td mat-cell *matCellDef="let producto" class="tp-monto">{{ producto.costoUsd | number: '1.2-2' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="margenPorcentaje">
+    <th mat-header-cell *matHeaderCellDef>Margen</th>
+    <td mat-cell *matCellDef="let producto" class="tp-monto">{{ producto.margenPorcentaje }}%</td>
+  </ng-container>
+
+  <ng-container matColumnDef="precioUsd">
+    <th mat-header-cell *matHeaderCellDef>Precio USD</th>
+    <td mat-cell *matCellDef="let producto" class="tp-monto">{{ producto.precioUsd | number: '1.2-2' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="precioBob">
+    <th mat-header-cell *matHeaderCellDef>Precio Bs</th>
+    <td mat-cell *matCellDef="let producto" class="tp-monto tp-precio-bob">{{ producto.precioBob | number: '1.2-2' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="stock">
+    <th mat-header-cell *matHeaderCellDef>Stock</th>
+    <td mat-cell *matCellDef="let producto" class="tp-monto" [class.tp-stock-bajo]="producto.stock <= 3">
+      {{ producto.stock }}
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+  <tr mat-row *matRowDef="let row; columns: columnas"></tr>
+</table>
+
+@if (productos().length === 0) {
+  <p class="tp-vacio">Aún no hay productos. Agrega el primero con "Nuevo producto".</p>
+}
+
+<ng-template #dialogoAltaProducto>
+  <h2 mat-dialog-title>Nuevo producto</h2>
+  <form [formGroup]="formularioProducto" (ngSubmit)="guardarProducto()">
+    <mat-dialog-content class="tp-formulario">
+      <mat-form-field appearance="outline">
+        <mat-label>SKU</mat-label>
+        <input matInput formControlName="sku" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Categoría</mat-label>
+        <input matInput formControlName="categoria" placeholder="GPU, CPU, RAM..." />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Costo (USD)</mat-label>
+        <input matInput type="number" step="0.01" formControlName="costoUsd" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Margen (%)</mat-label>
+        <input matInput type="number" step="0.1" formControlName="margenPorcentaje" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Stock inicial</mat-label>
+        <input matInput type="number" formControlName="stock" />
+      </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button type="button" mat-dialog-close>Cancelar</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="formularioProducto.invalid">Guardar</button>
+    </mat-dialog-actions>
+  </form>
+</ng-template>

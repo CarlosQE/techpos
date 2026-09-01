@@ -1,0 +1,50 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// SQLite no soporta enums nativos de Prisma — "origen" se guarda como String
+// y se valida en la capa de aplicación (ver src/modules/tipo-cambio/origen-cotizacion.ts).
+model TipoCambio {
+  id           String   @id @default(uuid())
+  fecha        DateTime @unique
+  valorOficial Float
+  origen       String   @default("BCB_AUTO")
+  createdAt    DateTime @default(now())
+}
+
+model Producto {
+  id               String         @id @default(uuid())
+  sku              String         @unique
+  nombre           String
+  categoria        String
+  costoUsd         Float
+  margenPorcentaje Float
+  stock            Int            @default(0)
+  createdAt        DateTime       @default(now())
+  detalles         DetalleVenta[]
+}
+
+model Venta {
+  id                 String         @id @default(uuid())
+  fechaHora          DateTime       @default(now())
+  tipoCambioAplicado Float
+  totalUsd           Float
+  totalBob           Float
+  detalles           DetalleVenta[]
+}
+
+model DetalleVenta {
+  id                String   @id @default(uuid())
+  ventaId           String
+  productoId        String
+  cantidad          Int
+  precioUnitarioUsd Float
+  precioUnitarioBob Float
+  venta             Venta    @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  producto          Producto @relation(fields: [productoId], references: [id])
+}

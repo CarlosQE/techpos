@@ -1,0 +1,113 @@
+<div class="tp-pos">
+  <section class="tp-pos__busqueda">
+    <h1>Punto de venta</h1>
+
+    <mat-form-field appearance="outline" class="tp-ancho-completo">
+      <mat-label>Buscar por SKU o nombre</mat-label>
+      <input
+        matInput
+        [ngModel]="terminoBusqueda()"
+        (ngModelChange)="buscar($event)"
+        [matAutocomplete]="autocompletado"
+        placeholder="Ej. RTX 4070, GPU-RTX4070"
+      />
+      <mat-icon matSuffix aria-hidden="true">search</mat-icon>
+    </mat-form-field>
+
+    <mat-autocomplete #autocompletado="matAutocomplete">
+      @for (producto of resultados(); track producto.id) {
+        <mat-option (onSelectionChange)="agregarAlCarrito(producto)">
+          {{ producto.nombre }} — stock: {{ producto.stock }}
+        </mat-option>
+      }
+    </mat-autocomplete>
+
+    <ul class="tp-resultados">
+      @for (producto of resultados(); track producto.id) {
+        <li class="tp-resultados__item">
+          <span>{{ producto.nombre }}</span>
+          <span class="tp-monto">stock: {{ producto.stock }}</span>
+          <button mat-icon-button color="primary" (click)="agregarAlCarrito(producto)" aria-label="Agregar al carrito">
+            <mat-icon>add_shopping_cart</mat-icon>
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <aside class="tp-pos__carrito">
+    <h2>
+      <mat-icon aria-hidden="true">shopping_cart</mat-icon>
+      Carrito
+    </h2>
+
+    @if (carrito.items().length === 0) {
+      <p class="tp-vacio">El carrito está vacío.</p>
+    }
+
+    @for (item of carrito.items(); track item.producto.id) {
+      <div class="tp-item-carrito">
+        <div class="tp-item-carrito__info">
+          <span>{{ item.producto.nombre }}</span>
+          <span class="tp-monto">{{ item.subtotalBob | number: '1.2-2' }} Bs</span>
+        </div>
+        <div class="tp-item-carrito__controles">
+          <button mat-icon-button (click)="cambiarCantidad(item.producto.id, item.cantidad - 1)" aria-label="Restar unidad">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <span class="tp-monto">{{ item.cantidad }}</span>
+          <button mat-icon-button (click)="cambiarCantidad(item.producto.id, item.cantidad + 1)" aria-label="Sumar unidad">
+            <mat-icon>add</mat-icon>
+          </button>
+          <button mat-icon-button (click)="cambiarCantidad(item.producto.id, 0)" aria-label="Quitar del carrito">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="tp-total">
+      <span>Total</span>
+      <span class="tp-monto">{{ carrito.totalBob() | number: '1.2-2' }} Bs</span>
+    </div>
+
+    <button
+      mat-flat-button
+      color="primary"
+      class="tp-ancho-completo"
+      [disabled]="carrito.items().length === 0 || cobrando()"
+      (click)="cobrar(dialogoTicket)"
+    >
+      <mat-icon aria-hidden="true">payments</mat-icon>
+      Cobrar
+    </button>
+  </aside>
+</div>
+
+<ng-template #dialogoTicket>
+  @if (ticket(); as t) {
+    <div class="tp-ticket">
+      <h2>TechPOS</h2>
+      <p class="tp-ticket__meta">{{ t.fecha | date: 'short' }} · TC: {{ t.tipoCambioAplicado }}</p>
+      <hr />
+      @for (linea of t.lineas; track linea.nombre) {
+        <div class="tp-ticket__linea">
+          <span>{{ linea.cantidad }}x {{ linea.nombre }}</span>
+          <span class="tp-monto">{{ linea.subtotalBob | number: '1.2-2' }}</span>
+        </div>
+      }
+      <hr />
+      <div class="tp-ticket__linea tp-ticket__total">
+        <span>Total</span>
+        <span class="tp-monto">{{ t.totalBob | number: '1.2-2' }} Bs</span>
+      </div>
+    </div>
+  }
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cerrar</button>
+    <button mat-flat-button color="primary" (click)="imprimirTicket()">
+      <mat-icon aria-hidden="true">print</mat-icon>
+      Imprimir
+    </button>
+  </mat-dialog-actions>
+</ng-template>

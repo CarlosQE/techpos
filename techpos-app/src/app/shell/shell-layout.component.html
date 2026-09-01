@@ -1,0 +1,86 @@
+<mat-toolbar class="tp-toolbar">
+  <button type="button" class="tp-toolbar__marca" (click)="abrirGatito()" aria-label="Abrir el gatito del proyecto">
+    <mat-icon aria-hidden="true">memory</mat-icon>
+    TechPOS
+  </button>
+
+  <nav class="tp-toolbar__nav">
+    @for (link of navLinks; track link.ruta) {
+      <a
+        mat-button
+        [routerLink]="link.ruta"
+        routerLinkActive="tp-toolbar__nav-link--activo"
+        class="tp-toolbar__nav-link"
+      >
+        <mat-icon aria-hidden="true">{{ link.icono }}</mat-icon>
+        {{ link.etiqueta }}
+      </a>
+    }
+  </nav>
+
+  <span class="tp-toolbar__spacer"></span>
+
+  <div class="tp-tc-chip" [class.tp-tc-chip--fallback]="ultimaSincronizacionEsFallback()">
+    <mat-icon aria-hidden="true">currency_exchange</mat-icon>
+    <span class="tp-monto">{{ chipTexto() }}</span>
+    @if (ultimaSincronizacionEsFallback()) {
+      <mat-icon aria-hidden="true" class="tp-tc-chip__alerta" matTooltip="Usando la última cotización guardada; el BCB no respondió">
+        warning
+      </mat-icon>
+    }
+  </div>
+
+  <button
+    mat-icon-button
+    (click)="sincronizar()"
+    [disabled]="sincronizando()"
+    aria-label="Sincronizar tipo de cambio"
+    matTooltip="Sincronizar tipo de cambio"
+  >
+    @if (sincronizando()) {
+      <mat-spinner diameter="20"></mat-spinner>
+    } @else {
+      <mat-icon>sync</mat-icon>
+    }
+  </button>
+
+  <button
+    mat-icon-button
+    (click)="abrirAjusteManual(dialogoAjusteManual)"
+    aria-label="Ajustar tipo de cambio manualmente"
+    matTooltip="Ajuste manual del tipo de cambio"
+  >
+    <mat-icon>edit</mat-icon>
+  </button>
+</mat-toolbar>
+
+<main class="tp-contenido">
+  <router-outlet></router-outlet>
+</main>
+
+<ng-template #dialogoAjusteManual>
+  <h2 mat-dialog-title>Ajuste manual del tipo de cambio</h2>
+  <mat-dialog-content>
+    <p>Usar solo ante una contingencia extrema del portal del BCB.</p>
+    <mat-form-field appearance="outline" class="tp-ancho-completo">
+      <mat-label>Tipo de cambio (Bs/USD)</mat-label>
+      <input matInput type="number" step="0.01" min="0" [ngModel]="valorManual()" (ngModelChange)="valorManual.set($event)" />
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-flat-button color="primary" (click)="confirmarAjusteManual()">Guardar</button>
+  </mat-dialog-actions>
+</ng-template>
+
+@if (mostrarGatito()) {
+  <div class="tp-gatito-overlay" (click)="cerrarGatito()">
+    <div class="tp-gatito-card" (click)="$event.stopPropagation()">
+      <pre class="tp-gatito-arte tp-gatito-arte--chico"> /\_/\
+( o.o )
+ &gt; ^ &lt; </pre>
+      <p class="tp-gatito-texto">tu maldita madre causa</p>
+      <p class="tp-gatito-sub">Haz clic en cualquier parte para cerrar.</p>
+    </div>
+  </div>
+}

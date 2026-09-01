@@ -1,0 +1,42 @@
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { CrearProductoDto } from './crear-producto.dto';
+
+const PRODUCTO_VALIDO = {
+  sku: 'GPU-RTX4070',
+  nombre: 'RTX 4070',
+  categoria: 'GPU',
+  costoUsd: 480,
+  margenPorcentaje: 25,
+  stock: 10,
+};
+
+async function validar(input: Record<string, unknown>) {
+  return validate(plainToInstance(CrearProductoDto, input));
+}
+
+describe('CrearProductoDto', () => {
+  it('acepta un producto con todos los campos válidos', async () => {
+    expect(await validar(PRODUCTO_VALIDO)).toHaveLength(0);
+  });
+
+  it('rechaza SKU vacío', async () => {
+    const errores = await validar({ ...PRODUCTO_VALIDO, sku: '' });
+    expect(errores[0].constraints).toHaveProperty('isNotEmpty');
+  });
+
+  it('rechaza costoUsd negativo o cero', async () => {
+    const errores = await validar({ ...PRODUCTO_VALIDO, costoUsd: 0 });
+    expect(errores[0].constraints).toHaveProperty('isPositive');
+  });
+
+  it('rechaza margenPorcentaje negativo', async () => {
+    const errores = await validar({ ...PRODUCTO_VALIDO, margenPorcentaje: -5 });
+    expect(errores[0].constraints).toHaveProperty('min');
+  });
+
+  it('rechaza stock no entero o negativo', async () => {
+    const errores = await validar({ ...PRODUCTO_VALIDO, stock: -1 });
+    expect(errores[0].constraints).toHaveProperty('min');
+  });
+});

@@ -1,0 +1,131 @@
+.tp-pos {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0 0 16px;
+  }
+}
+
+.tp-ancho-completo {
+  width: 100%;
+}
+
+.tp-resultados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--tp-outline);
+  border-radius: var(--tp-radius-sm);
+  overflow: hidden;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--tp-outline);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.tp-pos__carrito {
+  background: var(--tp-surface);
+  border-radius: var(--tp-radius-lg);
+  box-shadow: var(--tp-elevation-1);
+  padding: 16px;
+  align-self: start;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin: 0 0 12px;
+  }
+}
+
+.tp-item-carrito {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--tp-outline);
+
+  &__info {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__controles {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.tp-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+  padding: 12px 0;
+  border-top: 1px solid var(--tp-outline);
+  margin-bottom: 12px;
+}
+
+.tp-vacio {
+  color: var(--tp-on-surface-variant);
+  text-align: center;
+  padding: 16px 0;
+}
+
+// RF-3.4 — Ticket a 80mm, listo para impresión térmica.
+.tp-ticket {
+  width: 280px; // ~80mm
+  font-family: var(--tp-font-mono);
+  font-size: 0.8rem;
+
+  h2 {
+    text-align: center;
+    margin: 0 0 4px;
+  }
+
+  &__meta {
+    text-align: center;
+    color: var(--tp-on-surface-variant);
+    margin: 0 0 8px;
+  }
+
+  &__linea {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+
+  &__total {
+    font-weight: 700;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .tp-ticket,
+  .tp-ticket * {
+    visibility: visible;
+  }
+  .tp-ticket {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80mm;
+  }
+}
