@@ -12,23 +12,6 @@ function inicioDelDia(fecha: Date): Date {
 export class TipoCambioService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // RF-1.2/1.4 — Al sincronizar con el BCB se respeta un ajuste MANUAL hecho
-  // en el día: el valor de contingencia del admin no se pisa con el del portal.
-  async sincronizarDiario(fecha: Date, valorOficial: number) {
-    const fechaCorte = inicioDelDia(fecha);
-    const existente = await this.prisma.tipoCambio.findUnique({ where: { fecha: fechaCorte } });
-
-    if (existente?.origen === OrigenCotizacion.MANUAL) {
-      return existente;
-    }
-
-    return this.prisma.tipoCambio.upsert({
-      where: { fecha: fechaCorte },
-      update: { valorOficial, origen: OrigenCotizacion.BCB_AUTO },
-      create: { fecha: fechaCorte, valorOficial, origen: OrigenCotizacion.BCB_AUTO },
-    });
-  }
-
   upsertDiario(fecha: Date, valorOficial: number, origen: OrigenCotizacion = OrigenCotizacion.BCB_AUTO) {
     const fechaCorte = inicioDelDia(fecha);
     return this.prisma.tipoCambio.upsert({

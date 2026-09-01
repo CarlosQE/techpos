@@ -67,8 +67,23 @@
     }
 
     <div class="tp-total">
-      <span>Total</span>
-      <span class="tp-monto">{{ carrito.totalBob() | number: '1.2-2' }} Bs</span>
+      <span>Subtotal</span>
+      <span class="tp-monto">{{ carrito.subtotalBob() | number: '1.2-2' }} Bs</span>
+    </div>
+
+    <div class="tp-total tp-total--detalle">
+      <span>IVA (13%)</span>
+      <span class="tp-monto">{{ carrito.ivaBob() | number: '1.2-2' }} Bs</span>
+    </div>
+
+    <div class="tp-total tp-total--detalle">
+      <span>IT (3%)</span>
+      <span class="tp-monto">{{ carrito.itBob() | number: '1.2-2' }} Bs</span>
+    </div>
+
+    <div class="tp-total tp-total--total">
+      <span>Total a cobrar</span>
+      <span class="tp-monto">{{ carrito.totalConImpuestosBob() | number: '1.2-2' }} Bs</span>
     </div>
 
     <button
@@ -87,27 +102,84 @@
 <ng-template #dialogoTicket>
   @if (ticket(); as t) {
     <div class="tp-ticket">
-      <h2>TechPOS</h2>
-      <p class="tp-ticket__meta">{{ t.fecha | date: 'short' }} · TC: {{ t.tipoCambioAplicado }}</p>
-      <hr />
+      <header class="tp-ticket__header">
+        <div class="tp-ticket__marca">
+          <span class="tp-ticket__logo">TP</span>
+          <span class="tp-ticket__empresa">TechPOS S.R.L.</span>
+        </div>
+        <p class="tp-ticket__direccion">Av. Tecnológica N° 1234 — Zona Central</p>
+        <p class="tp-ticket__doc">NIT: 1029384-0-17 · La Paz - Bolivia</p>
+        <div class="tp-ticket__titulo">TICKET DE VENTA</div>
+        <div class="tp-ticket__folio">
+          <span>No. {{ folio() }}</span>
+          <span>{{ t.fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </header>
+
+      <div class="tp-ticket__regla"></div>
+
+      <div class="tp-ticket__meta">
+        <span>Tip. de cambio: Bs {{ t.tipoCambioAplicado | number: '1.2-2' }}</span>
+        <span>Moneda: Bolivianos (Bs)</span>
+      </div>
+
+      <div class="tp-ticket__cabeceras">
+        <span class="tp-ticket__col-cant">CANT.</span>
+        <span class="tp-ticket__col-desc">DESCRIPCIÓN</span>
+        <span class="tp-ticket__col-monto">IMPORTE</span>
+      </div>
+      <div class="tp-ticket__regla tp-ticket__regla--fina"></div>
+
       @for (linea of t.lineas; track linea.nombre) {
         <div class="tp-ticket__linea">
-          <span>{{ linea.cantidad }}x {{ linea.nombre }}</span>
-          <span class="tp-monto">{{ linea.subtotalBob | number: '1.2-2' }}</span>
+          <span class="tp-ticket__col-cant">{{ linea.cantidad }}</span>
+          <span class="tp-ticket__col-desc">
+            <span>{{ linea.nombre }}</span>
+            <span class="tp-ticket__unitario">{{ linea.precioUnitarioBob | number: '1.2-2' }} c/u</span>
+          </span>
+          <span class="tp-ticket__col-monto">{{ linea.subtotalBob | number: '1.2-2' }}</span>
         </div>
       }
-      <hr />
-      <div class="tp-ticket__linea tp-ticket__total">
-        <span>Total</span>
-        <span class="tp-monto">{{ t.totalBob | number: '1.2-2' }} Bs</span>
+
+      <div class="tp-ticket__regla tp-ticket__regla--fina"></div>
+
+      <div class="tp-ticket__resumen">
+        <div class="tp-ticket__linea">
+          <span>Subtotal</span>
+          <span class="tp-ticket__col-monto">{{ t.subtotalBob | number: '1.2-2' }}</span>
+        </div>
+        <div class="tp-ticket__linea">
+          <span>IVA (13%)</span>
+          <span class="tp-ticket__col-monto">{{ t.ivaBob | number: '1.2-2' }}</span>
+        </div>
+        <div class="tp-ticket__linea">
+          <span>IT (3%)</span>
+          <span class="tp-ticket__col-monto">{{ t.itBob | number: '1.2-2' }}</span>
+        </div>
+        <div class="tp-ticket__regla"></div>
+        <div class="tp-ticket__linea tp-ticket__total">
+          <span>TOTAL A PAGAR</span>
+          <span class="tp-ticket__col-monto">Bs {{ t.totalConImpuestosBob | number: '1.2-2' }}</span>
+        </div>
       </div>
+
+      <div class="tp-ticket__regla"></div>
+
+      <footer class="tp-ticket__pie">
+        <p>¡Gracias por su compra!</p>
+        <p>Artículos vendidos no retornables sin su factura original.</p>
+      </footer>
     </div>
   }
-  <mat-dialog-actions align="end">
+  <mat-dialog-actions align="center" class="tp-acciones">
     <button mat-button mat-dialog-close>Cerrar</button>
     <button mat-flat-button color="primary" (click)="imprimirTicket()">
       <mat-icon aria-hidden="true">print</mat-icon>
       Imprimir
+    </button>
+    <button mat-stroked-button color="primary" mat-dialog-close>
+      <mat-icon aria-hidden="true">check</mat-icon>
+      Confirmar
     </button>
   </mat-dialog-actions>
 </ng-template>

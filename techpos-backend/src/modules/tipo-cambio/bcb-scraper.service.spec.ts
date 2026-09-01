@@ -35,13 +35,12 @@ const registroHistorico = {
 };
 
 describe('BcbScraperService', () => {
-  let tipoCambioService: jest.Mocked<Pick<TipoCambioService, 'sincronizarDiario' | 'upsertDiario' | 'findUltimo'>>;
+  let tipoCambioService: jest.Mocked<Pick<TipoCambioService, 'upsertDiario' | 'findUltimo'>>;
   let scraper: BcbScraperService;
 
   beforeEach(() => {
     jest.clearAllMocks();
     tipoCambioService = {
-      sincronizarDiario: jest.fn().mockResolvedValue(registroUpsert),
       upsertDiario: jest.fn().mockResolvedValue(registroUpsert),
       findUltimo: jest.fn().mockResolvedValue(null),
     };
@@ -76,7 +75,7 @@ describe('BcbScraperService', () => {
 
       const resultado = await scraper.obtenerVigenteConFallback();
 
-      expect(tipoCambioService.sincronizarDiario).toHaveBeenCalledWith(expect.any(Date), 11.92);
+      expect(tipoCambioService.upsertDiario).toHaveBeenCalledWith(expect.any(Date), 11.92);
       expect(tipoCambioService.findUltimo).not.toHaveBeenCalled();
       expect(resultado).toEqual({
         valorOficial: registroUpsert.valorOficial,
@@ -117,8 +116,8 @@ describe('BcbScraperService', () => {
 
       await scraper.scrapeDiario();
 
-      expect(tipoCambioService.sincronizarDiario).toHaveBeenCalledTimes(1);
-      expect(tipoCambioService.sincronizarDiario).toHaveBeenCalledWith(expect.any(Date), 11.92);
+      expect(tipoCambioService.upsertDiario).toHaveBeenCalledTimes(1);
+      expect(tipoCambioService.upsertDiario).toHaveBeenCalledWith(expect.any(Date), 11.92);
     });
 
     it('usa el fallback y no propaga error si el scraping falla pero hay histórico', async () => {

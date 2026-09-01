@@ -44,9 +44,22 @@ export class CarritoService {
     +this.items().reduce((acc, item) => acc + item.subtotalUsd, 0).toFixed(2)
   );
 
-  readonly totalBob = computed<number>(() =>
+  // Subtotal en Bs (sin impuestos), IVA 13%, IT 3% y total con impuestos,
+  // conforme a la normativa boliviana.
+  readonly subtotalBob = computed<number>(() =>
     +this.items().reduce((acc, item) => acc + item.subtotalBob, 0).toFixed(2)
   );
+
+  readonly ivaBob = computed<number>(() => +(this.subtotalBob() * 0.13).toFixed(2));
+
+  readonly itBob = computed<number>(() => +(this.subtotalBob() * 0.03).toFixed(2));
+
+  readonly totalConImpuestosBob = computed<number>(() =>
+    +(this.subtotalBob() + this.ivaBob() + this.itBob()).toFixed(2)
+  );
+
+  // Compatibilidad: total Bob sin impuestos (subtotal).
+  readonly totalBob = computed<number>(() => this.subtotalBob());
 
   actualizarTipoCambio(tipoCambio: number): void {
     this.catalogoPricing.actualizarTipoCambio(tipoCambio);

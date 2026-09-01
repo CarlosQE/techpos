@@ -49,6 +49,15 @@
     </td>
   </ng-container>
 
+  <ng-container matColumnDef="acciones">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let producto" class="tp-acciones">
+      <button mat-icon-button color="primary" (click)="abrirEdicionProducto(producto, dialogoAltaProducto)" aria-label="Editar producto">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
   <tr mat-header-row *matHeaderRowDef="columnas"></tr>
   <tr mat-row *matRowDef="let row; columns: columnas"></tr>
 </table>
@@ -58,37 +67,44 @@
 }
 
 <ng-template #dialogoAltaProducto>
-  <h2 mat-dialog-title>Nuevo producto</h2>
+  <h2 mat-dialog-title>{{ editandoId() ? 'Editar producto' : 'Nuevo producto' }}</h2>
   <form [formGroup]="formularioProducto" (ngSubmit)="guardarProducto()">
     <mat-dialog-content class="tp-formulario">
       <mat-form-field appearance="outline">
-        <mat-label>SKU</mat-label>
-        <input matInput formControlName="sku" />
-      </mat-form-field>
-      <mat-form-field appearance="outline">
         <mat-label>Nombre</mat-label>
         <input matInput formControlName="nombre" />
+        <mat-error *ngIf="formularioProducto.controls['nombre'].hasError('required')">El nombre es obligatorio</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Categoría</mat-label>
         <input matInput formControlName="categoria" placeholder="GPU, CPU, RAM..." />
+        <mat-error *ngIf="formularioProducto.controls['categoria'].hasError('required')">La categoría es obligatoria</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Costo (USD)</mat-label>
         <input matInput type="number" step="0.01" formControlName="costoUsd" />
+        <mat-error *ngIf="formularioProducto.controls['costoUsd'].hasError('min')">Debe ser mayor a 0</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Margen (%)</mat-label>
         <input matInput type="number" step="0.1" formControlName="margenPorcentaje" />
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>Stock inicial</mat-label>
+        <mat-label>Stock</mat-label>
         <input matInput type="number" formControlName="stock" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>SKU (código de 3 dígitos)</mat-label>
+        <input matInput formControlName="sku" placeholder="Opcional: se autogenera" />
+        <mat-hint>Si lo dejas vacío, se asigna automáticamente.</mat-hint>
+        <mat-error *ngIf="formularioProducto.controls['sku'].hasError('skuInvalido')">El SKU debe ser un código numérico de 3 dígitos</mat-error>
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button type="button" mat-dialog-close>Cancelar</button>
-      <button mat-flat-button color="primary" type="submit" [disabled]="formularioProducto.invalid">Guardar</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="formularioProducto.invalid">
+        {{ editandoId() ? 'Guardar cambios' : 'Guardar' }}
+      </button>
     </mat-dialog-actions>
   </form>
 </ng-template>

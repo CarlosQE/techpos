@@ -23,15 +23,29 @@ let ProductosService = class ProductosService {
         this.prisma = prisma;
     }
     async crear(dto) {
+        const data = { ...dto, sku: dto.sku ?? (await this.generarSku()) };
+        if (data.sku)
+            await this.validarUnicoAlCrear(data.sku, data.nombre);
         try {
-            return await this.prisma.producto.create({ data: dto });
+            return await this.prisma.producto.create({ data });
         }
         catch (error) {
             if (esViolacionDeUnicidad(error)) {
-                throw new common_1.ConflictException(`Ya existe un producto con SKU "${dto.sku}"`);
+                throw new common_1.ConflictException(this.describirConflicto(error));
             }
             throw error;
         }
+    }
+    // Genera un SKU secuencial de 3 dígitos (mayor existente + 1, con padding).
+    async generarSku() {
+        const productos = await this.prisma.producto.findMany({
+            select: { sku: true },
+        });
+        const maximo = productos.reduce((acc, p) => {
+            const n = parseInt(p.sku, 10);
+            return Number.isInteger(n) && n > acc ? n : acc;
+        }, 0);
+        return String(maximo + 1).padStart(3, '0');
     }
     listar() {
         return this.prisma.producto.findMany({ orderBy: { nombre: 'asc' } });
@@ -60,15 +74,60 @@ let ProductosService = class ProductosService {
     }
     async actualizar(id, dto) {
         await this.obtener(id);
+        if (dto.sku !== undefined || dto.nombre !== undefined) {
+            await this.validarUnicoAlActualizar(id, dto.sku, dto.nombre);
+        }
         try {
             return await this.prisma.producto.update({ where: { id }, data: dto });
         }
         catch (error) {
             if (esViolacionDeUnicidad(error)) {
-                throw new common_1.ConflictException(`Ya existe un producto con SKU "${dto.sku}"`);
+                throw new common_1.ConflictException(this.describirConflicto(error));
             }
             throw error;
         }
+    }
+    // Detecta SKU/nombre ya usados por OTRO producto, antes de crear/actualizar,
+    // para dar mensajes claros de conflicto en lugar de una genérica P2002.
+    async validarUnicoAlCrear(sku, nombre) {
+        const existente = await this.prisma.producto.findFirst({
+            where: {
+                OR: [...(sku ? [{ sku }] : []), ...(nombre ? [{ nombre }] : [])],
+            },
+            select: { sku: true, nombre: true },
+        });
+        if (!existente)
+            return;
+        if (existente.sku === sku) {
+            throw new common_1.ConflictException(`Ya existe un producto con el SKU "${sku}"`);
+        }
+        throw new common_1.ConflictException(`Ya existe un producto con el nombre "${nombre}"`);
+    }
+    async validarUnicoAlActualizar(id, sku, nombre) {
+        const existente = await this.prisma.producto.findFirst({
+            where: {
+                NOT: { id },
+                AND: [
+                    { OR: [...(sku ? [{ sku }] : []), ...(nombre ? [{ nombre }] : [])] },
+                ],
+            },
+            select: { sku: true, nombre: true },
+        });
+        if (!existente)
+            return;
+        if (sku && existente.sku === sku) {
+            throw new common_1.ConflictException(`Ya existe un producto con el SKU "${sku}"`);
+        }
+        throw new common_1.ConflictException(`Ya existe un producto con el nombre "${nombre}"`);
+    }
+    describirConflicto(error) {
+        const meta = error.meta;
+        const campo = meta?.target?.[0];
+        if (campo === 'sku')
+            return 'Ya existe un producto con ese SKU';
+        if (campo === 'nombre')
+            return 'Ya existe un producto con ese nombre';
+        return 'Ya existe un producto duplicado';
     }
     async eliminar(id) {
         await this.obtener(id);

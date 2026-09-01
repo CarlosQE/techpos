@@ -22,20 +22,6 @@ let TipoCambioService = class TipoCambioService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    // RF-1.2/1.4 — Al sincronizar con el BCB se respeta un ajuste MANUAL hecho
-    // en el día: el valor de contingencia del admin no se pisa con el del portal.
-    async sincronizarDiario(fecha, valorOficial) {
-        const fechaCorte = inicioDelDia(fecha);
-        const existente = await this.prisma.tipoCambio.findUnique({ where: { fecha: fechaCorte } });
-        if (existente?.origen === origen_cotizacion_1.OrigenCotizacion.MANUAL) {
-            return existente;
-        }
-        return this.prisma.tipoCambio.upsert({
-            where: { fecha: fechaCorte },
-            update: { valorOficial, origen: origen_cotizacion_1.OrigenCotizacion.BCB_AUTO },
-            create: { fecha: fechaCorte, valorOficial, origen: origen_cotizacion_1.OrigenCotizacion.BCB_AUTO },
-        });
-    }
     upsertDiario(fecha, valorOficial, origen = origen_cotizacion_1.OrigenCotizacion.BCB_AUTO) {
         const fechaCorte = inicioDelDia(fecha);
         return this.prisma.tipoCambio.upsert({

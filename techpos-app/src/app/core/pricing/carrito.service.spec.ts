@@ -53,6 +53,16 @@ describe('CarritoService (RF-3.2)', () => {
     expect(carrito.totalBob()).toBeCloseTo(600 * 11.52, 5);
   });
 
+  it('calcula IVA (13%) e IT (3%) y el total con impuestos sobre el subtotal', () => {
+    carrito.agregar(RTX_4070, 1);
+
+    const subtotal = 600 * 11.52;
+    expect(carrito.subtotalBob()).toBeCloseTo(subtotal, 5);
+    expect(carrito.ivaBob()).toBeCloseTo(subtotal * 0.13, 5);
+    expect(carrito.itBob()).toBeCloseTo(subtotal * 0.03, 5);
+    expect(carrito.totalConImpuestosBob()).toBeCloseTo(subtotal * 1.16, 5);
+  });
+
   it('recalcula los subtotales en vivo si cambia el tipo de cambio', () => {
     carrito.agregar(RTX_4070, 1);
     expect(carrito.totalBob()).toBeCloseTo(600 * 11.52, 5);

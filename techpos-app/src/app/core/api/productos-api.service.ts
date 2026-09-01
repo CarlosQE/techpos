@@ -14,7 +14,7 @@ export interface ProductoDto {
 }
 
 export interface CrearProductoPayload {
-  sku: string;
+  sku?: string;
   nombre: string;
   categoria: string;
   costoUsd: number;
@@ -42,5 +42,9 @@ export class ProductosApiService {
 
   crear(payload: CrearProductoPayload): Observable<ProductoDto> {
     return this.http.post<ProductoDto>(URL, payload);
+  }
+
+  actualizar(id: string, payload: Partial<CrearProductoPayload>): Observable<ProductoDto> {
+    return this.http.patch<ProductoDto>(`${URL}/${id}`, payload);
   }
 }

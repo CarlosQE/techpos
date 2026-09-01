@@ -5,7 +5,7 @@ import { ProductosService } from './productos.service';
 import type { PrismaService } from '../../prisma/prisma.service';
 
 const PRODUCTO_DTO = {
-  sku: 'GPU-RTX4070',
+  sku: '024',
   nombre: 'RTX 4070',
   categoria: 'GPU',
   costoUsd: 480,
@@ -20,6 +20,7 @@ describe('ProductosService', () => {
     producto: {
       create: jest.Mock;
       findMany: jest.Mock;
+      findFirst: jest.Mock;
       findUnique: jest.Mock;
       update: jest.Mock;
       delete: jest.Mock;
@@ -32,6 +33,7 @@ describe('ProductosService', () => {
       producto: {
         create: jest.fn(),
         findMany: jest.fn(),
+        findFirst: jest.fn(),
         findUnique: jest.fn(),
         update: jest.fn(),
         delete: jest.fn(),
@@ -48,10 +50,46 @@ describe('ProductosService', () => {
       expect(prisma.producto.create).toHaveBeenCalledWith({ data: PRODUCTO_DTO });
     });
 
+    it('autogenera el SKU de 3 dígitos cuando no se provee', async () => {
+      prisma.producto.findMany.mockResolvedValue([{ sku: '023' }]);
+      prisma.producto.create.mockResolvedValue(PRODUCTO_GUARDADO);
+
+      await service.crear({ ...PRODUCTO_DTO, sku: undefined });
+
+      expect(prisma.producto.create).toHaveBeenCalledWith({
+        data: { ...PRODUCTO_DTO, sku: '024' },
+      });
+    });
+
+    it('autogenera el primer SKU cuando no existe ningún producto', async () => {
+      prisma.producto.findMany.mockResolvedValue([]);
+      prisma.producto.create.mockResolvedValue(PRODUCTO_GUARDADO);
+
+      await service.crear({ ...PRODUCTO_DTO, sku: undefined });
+
+      expect(prisma.producto.create).toHaveBeenCalledWith({
+        data: { ...PRODUCTO_DTO, sku: '001' },
+      });
+    });
+
     it('traduce SKU duplicado (P2002) a ConflictException', async () => {
-      prisma.producto.create.mockRejectedValue({ code: 'P2002' });
+      prisma.producto.create.mockRejectedValue({ code: 'P2002', meta: { target: ['sku'] } });
 
       await expect(service.crear(PRODUCTO_DTO)).rejects.toBeInstanceOf(ConflictException);
+    });
+
+    it('lanza ConflictException si otro producto ya usa el mismo SKU', async () => {
+      prisma.producto.findFirst.mockResolvedValue({ sku: '024', nombre: 'OTRO' });
+
+      await expect(service.crear(PRODUCTO_DTO)).rejects.toThrow('Ya existe un producto con el SKU "024"');
+      expect(prisma.producto.create).not.toHaveBeenCalled();
+    });
+
+    it('lanza ConflictException si otro producto ya usa el mismo nombre', async () => {
+      prisma.producto.findFirst.mockResolvedValue({ sku: '999', nombre: 'RTX 4070' });
+
+      await expect(service.crear(PRODUCTO_DTO)).rejects.toThrow('Ya existe un producto con el nombre "RTX 4070"');
+      expect(prisma.producto.create).not.toHaveBeenCalled();
     });
   });
 
@@ -110,6 +148,36 @@ describe('ProductosService', () => {
 
       await expect(service.actualizar('inexistente', { stock: 5 })).rejects.toBeInstanceOf(NotFoundException);
       expect(prisma.producto.update).not.toHaveBeenCalled();
+    });
+
+    it('lanza ConflictException si se asigna un SKU de otro producto', async () => {
+      prisma.producto.findUnique.mockResolvedValue(PRODUCTO_GUARDADO);
+      prisma.producto.findFirst.mockResolvedValue({ sku: '023', nombre: 'Otra GPU' });
+
+      await expect(service.actualizar('uuid-1', { sku: '023' })).rejects.toThrow(
+        'Ya existe un producto con el SKU "023"',
+      );
+      expect(prisma.producto.update).not.toHaveBeenCalled();
+    });
+
+    it('lanza ConflictException si se asigna un nombre de otro producto', async () => {
+      prisma.producto.findUnique.mockResolvedValue(PRODUCTO_GUARDADO);
+      prisma.producto.findFirst.mockResolvedValue({ sku: '999', nombre: 'Almacenamiento X' });
+
+      await expect(service.actualizar('uuid-1', { nombre: 'Almacenamiento X' })).rejects.toThrow(
+        'Ya existe un producto con el nombre "Almacenamiento X"',
+      );
+      expect(prisma.producto.update).not.toHaveBeenCalled();
+    });
+
+    it('no lanza conflicto si SKU/nombre nuevos coinciden con el propio producto', async () => {
+      prisma.producto.findUnique.mockResolvedValue(PRODUCTO_GUARDADO);
+      prisma.producto.findFirst.mockResolvedValue(null);
+      prisma.producto.update.mockResolvedValue(PRODUCTO_GUARDADO);
+
+      await expect(service.actualizar('uuid-1', { sku: '024', nombre: 'RTX 4070' })).resolves.toEqual(
+        PRODUCTO_GUARDADO,
+      );
     });
   });
 

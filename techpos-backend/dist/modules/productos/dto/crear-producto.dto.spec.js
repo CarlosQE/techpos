@@ -4,7 +4,7 @@ const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 const crear_producto_dto_1 = require("./crear-producto.dto");
 const PRODUCTO_VALIDO = {
-    sku: 'GPU-RTX4070',
+    sku: '024',
     nombre: 'RTX 4070',
     categoria: 'GPU',
     costoUsd: 480,
@@ -18,9 +18,17 @@ describe('CrearProductoDto', () => {
     it('acepta un producto con todos los campos válidos', async () => {
         expect(await validar(PRODUCTO_VALIDO)).toHaveLength(0);
     });
+    it('acepta un producto sin SKU (se autogenera en el servicio)', async () => {
+        const { sku: _sku, ...sinSku } = PRODUCTO_VALIDO;
+        expect(await validar(sinSku)).toHaveLength(0);
+    });
     it('rechaza SKU vacío', async () => {
         const errores = await validar({ ...PRODUCTO_VALIDO, sku: '' });
         expect(errores[0].constraints).toHaveProperty('isNotEmpty');
+    });
+    it('rechaza SKU que no sea numérico de 3 dígitos', async () => {
+        const errores = await validar({ ...PRODUCTO_VALIDO, sku: 'GPU-42' });
+        expect(errores.some((e) => e.constraints?.matches)).toBe(true);
     });
     it('rechaza costoUsd negativo o cero', async () => {
         const errores = await validar({ ...PRODUCTO_VALIDO, costoUsd: 0 });

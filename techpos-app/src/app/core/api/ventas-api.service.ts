@@ -21,6 +21,12 @@ export interface VentaDto {
   tipoCambioAplicado: number;
   totalUsd: number;
   totalBob: number;
+  subtotalBob: number;
+  iva13Porcentaje: number;
+  ivaBob: number;
+  it3Porcentaje: number;
+  itBob: number;
+  totalConImpuestosBob: number;
   detalles: DetalleVentaDto[];
 }
 

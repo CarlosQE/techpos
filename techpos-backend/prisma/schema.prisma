@@ -20,7 +20,7 @@ model TipoCambio {
 model Producto {
   id               String         @id @default(uuid())
   sku              String         @unique
-  nombre           String
+  nombre           String         @unique
   categoria        String
   costoUsd         Float
   margenPorcentaje Float
@@ -35,6 +35,12 @@ model Venta {
   tipoCambioAplicado Float
   totalUsd           Float
   totalBob           Float
+  subtotalBob        Float          @default(0)
+  iva13Porcentaje    Float          @default(0.13)
+  ivaBob             Float          @default(0)
+  it3Porcentaje      Float          @default(0.03)
+  itBob              Float          @default(0)
+  totalConImpuestosBob Float        @default(0)
   detalles           DetalleVenta[]
 }
 

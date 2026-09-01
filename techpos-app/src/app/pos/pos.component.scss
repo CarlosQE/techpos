@@ -86,46 +86,158 @@
   padding: 16px 0;
 }
 
-// RF-3.4 — Ticket a 80mm, listo para impresión térmica.
+// RF-3.4 — Ticket a 80mm, listo para impresión térmica (se imprime en una
+// ventana de impresión independiente desde imprimirTicket()).
 .tp-ticket {
-  width: 280px; // ~80mm
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
   font-family: var(--tp-font-mono);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
+  color: var(--tp-on-surface);
+  line-height: 1.35;
 
-  h2 {
+  &__header {
     text-align: center;
-    margin: 0 0 4px;
+  }
+
+  &__marca {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  &__logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: var(--tp-primary);
+    color: var(--tp-on-primary);
+    font-weight: 700;
+    font-size: 0.7rem;
+  }
+
+  &__empresa {
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+  }
+
+  &__direccion,
+  &__doc {
+    margin: 2px 0 0;
+    color: var(--tp-on-surface-variant);
+    font-size: 0.66rem;
+  }
+
+  &__titulo {
+    margin-top: 8px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    border: 1px solid var(--tp-on-surface);
+    border-radius: 4px;
+    padding: 3px 0;
+  }
+
+  &__folio {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 0.68rem;
+    color: var(--tp-on-surface-variant);
+  }
+
+  &__regla {
+    height: 2px;
+    background: var(--tp-on-surface);
+    margin: 8px 0;
+    border-radius: 1px;
+
+    &--fina {
+      height: 1px;
+      opacity: 0.5;
+      margin: 6px 0;
+    }
   }
 
   &__meta {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.64rem;
     color: var(--tp-on-surface-variant);
-    margin: 0 0 8px;
+    margin-bottom: 6px;
+  }
+
+  &__cabeceras {
+    display: flex;
+    font-weight: 700;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__col-cant {
+    width: 38px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  &__col-desc {
+    flex: 1;
+    padding: 0 4px;
+  }
+
+  &__col-monto {
+    min-width: 62px;
+    text-align: right;
   }
 
   &__linea {
     display: flex;
-    justify-content: space-between;
+    align-items: flex-start;
     padding: 2px 0;
+
+    > .tp-ticket__col-cant {
+      padding-top: 1px;
+    }
+  }
+
+  &__unitario {
+    display: block;
+    font-size: 0.62rem;
+    color: var(--tp-on-surface-variant);
+  }
+
+  &__resumen {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
   &__total {
     font-weight: 700;
+    font-size: 0.82rem;
+    padding-top: 4px;
+  }
+
+  &__pie {
+    text-align: center;
+    font-size: 0.62rem;
+    color: var(--tp-on-surface-variant);
+
+    p {
+      margin: 2px 0;
+    }
   }
 }
 
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  .tp-ticket,
-  .tp-ticket * {
-    visibility: visible;
-  }
-  .tp-ticket {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 80mm;
-  }
+.tp-acciones {
+  margin-top: 12px;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--tp-outline);
 }

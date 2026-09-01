@@ -15,8 +15,10 @@ class CrearProductoDto {
 }
 exports.CrearProductoDto = CrearProductoDto;
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.Matches)(/^\d{3}$/, { message: 'sku debe ser un código numérico de 3 dígitos' }),
     __metadata("design:type", String)
 ], CrearProductoDto.prototype, "sku", void 0);
 __decorate([

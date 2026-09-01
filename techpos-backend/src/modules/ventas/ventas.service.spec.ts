@@ -38,13 +38,26 @@ describe('VentasService.crearVenta (RF-3.3)', () => {
   it('crea la venta congelando el tipo de cambio y los precios unitarios', async () => {
     const venta = await service.crearVenta({ items: [{ productoId: 'prod-1', cantidad: 2 }] });
 
-    // precioUsd = 480 * 1.25 = 600; totalUsd = 1200; totalBob = 1200 * 11.52
+    // precioUsd = 480 * 1.25 = 600; totalUsd = 1200; totalBob(subtotal) = 1200 * 11.52
     expect(venta.tipoCambioAplicado).toBe(11.52);
     expect(venta.totalUsd).toBe(1200);
     expect(venta.totalBob).toBeCloseTo(1200 * 11.52, 5);
     expect(venta.detalles).toEqual([
       { productoId: 'prod-1', cantidad: 2, precioUnitarioUsd: 600, precioUnitarioBob: 600 * 11.52 },
     ]);
+  });
+
+  it('calcula IVA 13% e IT 3% sobre el subtotal y el total con impuestos (normativa boliviana)', async () => {
+    const venta = await service.crearVenta({ items: [{ productoId: 'prod-1', cantidad: 2 }] });
+
+    // subtotal = 1200 * 11.52 = 13824
+    expect(venta.subtotalBob).toBeCloseTo(13824, 2);
+    expect(venta.iva13Porcentaje).toBe(0.13);
+    expect(venta.ivaBob).toBeCloseTo(13824 * 0.13, 2);
+    expect(venta.it3Porcentaje).toBe(0.03);
+    expect(venta.itBob).toBeCloseTo(13824 * 0.03, 2);
+    const esperado = 13824 + 13824 * 0.13 + 13824 * 0.03;
+    expect(venta.totalConImpuestosBob).toBeCloseTo(esperado, 2);
   });
 
   it('descuenta el stock del producto vendido', async () => {

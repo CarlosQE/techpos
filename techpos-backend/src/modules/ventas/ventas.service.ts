@@ -3,6 +3,10 @@ import { calcularPrecioBob, calcularPrecioUsd, redondearCentavos } from '../../c
 import { PrismaService } from '../../prisma/prisma.service';
 import { CrearVentaDto } from './dto/crear-venta.dto';
 
+// Normativa boliviana: IVA 13% e IT 3%, calculados sobre el total de la venta.
+const IVA_PORCENTAJE = 0.13;
+const IT_PORCENTAJE = 0.03;
+
 @Injectable()
 export class VentasService {
   constructor(private readonly prisma: PrismaService) {}
@@ -49,13 +53,22 @@ export class VentasService {
       }
 
       const totalUsdRedondeado = redondearCentavos(totalUsd);
-      const totalBob = redondearCentavos(totalUsdRedondeado * tipoCambioVigente.valorOficial);
+      const subtotalBob = redondearCentavos(totalUsdRedondeado * tipoCambioVigente.valorOficial);
+      const ivaBob = redondearCentavos(subtotalBob * IVA_PORCENTAJE);
+      const itBob = redondearCentavos(subtotalBob * IT_PORCENTAJE);
+      const totalConImpuestosBob = redondearCentavos(subtotalBob + ivaBob + itBob);
 
       return tx.venta.create({
         data: {
           tipoCambioAplicado: tipoCambioVigente.valorOficial,
           totalUsd: totalUsdRedondeado,
-          totalBob,
+          totalBob: subtotalBob,
+          subtotalBob,
+          iva13Porcentaje: IVA_PORCENTAJE,
+          ivaBob,
+          it3Porcentaje: IT_PORCENTAJE,
+          itBob,
+          totalConImpuestosBob,
           detalles: { create: detalles },
         },
         include: { detalles: true },

@@ -1,9 +1,12 @@
-import { IsInt, IsNotEmpty, IsNumber, IsPositive, IsString, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Matches, Min } from 'class-validator';
 
 export class CrearProductoDto {
+  // Opcional: si se omite, el servicio genera un SKU automático de 3 dígitos.
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  sku: string;
+  @Matches(/^\d{3}$/, { message: 'sku debe ser un código numérico de 3 dígitos' })
+  sku?: string;
 
   @IsString()
   @IsNotEmpty()

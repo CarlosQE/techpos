@@ -37,7 +37,9 @@ export class BcbScraperService {
   async obtenerVigenteConFallback(): Promise<CotizacionVigente> {
     try {
       const valor = await this.obtenerTcoVigente();
-      const registro = await this.tipoCambioService.sincronizarDiario(new Date(), valor);
+      // Sincronizar siempre re-nivela al valor oficial del BCB, aunque hoy se
+      // haya hecho un ajuste manual: la fuente de verdad es el scraper.
+      const registro = await this.tipoCambioService.upsertDiario(new Date(), valor);
       this.logger.log(`TCO actualizado: ${registro.valorOficial} Bs/USD`);
       return { valorOficial: registro.valorOficial, origen: registro.origen, fecha: registro.fecha, esFallback: false };
     } catch (error) {
