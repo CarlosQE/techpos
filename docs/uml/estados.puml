@@ -1,0 +1,27 @@
+@startuml
+skinparam style strictuml
+title Diagrama de Estados - Flujo de Venta POS
+
+[*] --> Iniciada : Abrir módulo POS
+
+state Iniciada {
+  [*] --> AgregandoProductos
+}
+
+AgregandoProductos --> RevisandoCarrito : Ver resumen financiero
+RevisandoCarrito --> AgregandoProductos : Modificar cantidades (Atajo Ctrl+K)
+
+RevisandoCarrito --> ProcesandoTransaccion : Clic "Confirmar y Emitir Ticket"
+
+state ProcesandoTransaccion {
+  [*] --> TasaCongelada : Aplicar cotización BCB
+  TasaCongelada --> DescontandoStock : Validar inventario
+}
+
+ProcesandoTransaccion --> VentaCompletada : Transacción exitosa BD
+VentaCompletada --> [*] : Imprimir comprobante
+
+Iniciada --> VentaCancelada : Botón "Cancelar operación"
+RevisandoCarrito --> VentaCancelada : Botón "Cancelar operación"
+VentaCancelada --> [*] : Vaciar carrito
+@enduml

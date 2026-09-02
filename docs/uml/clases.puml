@@ -1,0 +1,37 @@
+@startuml
+skinparam style strictuml
+title Diagrama de Clases - Modelo de Datos
+
+class TipoCambio {
+  + id: String
+  + fecha: DateTime
+  + valorOficial: Float
+  + origen: String
+}
+
+class Producto {
+  + id: String
+  + sku: String
+  + nombre: String
+  + costoUsd: Float
+  + margenPorcentaje: Float
+  + stock: Int
+}
+
+class Venta {
+  + id: String
+  + fechaHora: DateTime
+  + tipoCambioAplicado: Float
+  + totalUsd: Float
+  + totalBob: Float
+}
+
+class DetalleVenta {
+  + cantidad: Int
+  + precioUnitarioUsd: Float
+  + precioUnitarioBob: Float
+}
+
+Venta "1" *-- "1..*" DetalleVenta : contiene >
+Producto "1" -- "0..*" DetalleVenta : detalla >
+@enduml

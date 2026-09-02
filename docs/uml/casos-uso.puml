@@ -1,0 +1,20 @@
+@startuml
+left to right direction
+skinparam style strictuml
+title Diagrama de Casos de Uso - MVP Mamitas Puebla Deluxe
+
+actor "Administrador / Propietario" as admin #e8f0fe
+actor "Cajero / Vendedor" as cajero #e6f4ea
+
+package "Sistema POS & Motor Divisas" {
+  usecase "Sincronizar Cotización BCB (US-02)" as UC1
+  usecase "Gestionar Inventario Hardware (US-03)" as UC2
+  usecase "Buscar y Carrito POS (US-05)" as UC3
+  usecase "Procesar Venta Atómica (US-06)" as UC4
+}
+
+admin --> UC1
+admin --> UC2
+cajero --> UC3
+cajero --> UC4
+@enduml

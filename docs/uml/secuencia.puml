@@ -1,0 +1,18 @@
+@startuml
+skinparam style strictuml
+title Diagrama de Secuencia - US-06: Venta Atómica POS
+
+actor "Cajero POS" as cajero #e6f4ea
+participant "📱 POS UI" as ui #e6f4ea
+participant "⚙️ VentasService" as srv #f8f9fa
+database "🗄️ Prisma DB" as db #e8f0fe
+
+cajero -> ui : 1: Clic 'Procesar Venta'
+ui -> srv : 2: POST /api/ventas { items: [...] }
+srv -> db : 3: Obtiene Tasa BCB Actual
+srv -> db : 4: Descuenta Stock de Hardware
+srv -> db : 5: Guarda Venta (congela tasa)
+db --> srv : 6: 201 Created (Transacción Atómica)
+srv --> ui : 7: Retorna Venta JSON
+ui -> cajero : 8: Despliega ReceiptDialog e Imprime Ticket
+@enduml
